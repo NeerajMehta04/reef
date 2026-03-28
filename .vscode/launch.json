@@ -2,17 +2,16 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch PHP Server",
+            "name": "PHP: Install & Run",
             "type": "node-terminal",
             "request": "launch",
             "command": "./setup-php.sh",
-            "cwd": "${workspaceFolder}"
-        },
-        {
-            "name": "Listen for Xdebug",
-            "type": "php",
-            "request": "launch",
-            "port": 9003
+            "cwd": "${workspaceFolder}",
+            "serverReadyAction": {
+                "pattern": "Starting PHP server on (http://\\S+)",
+                "uriFormat": "%s",
+                "action": "openExternally"
+            }
         }
     ]
 }

@@ -5,6 +5,11 @@ This app relies on [Git](https://git-scm.com/).
 
 ## Getting Started
 
+1. Install the recommended extensions for VS Code.
+2. Open Run and Debug view in VS Code.
+3. Select "Launch PHP Server" and click the play button.
+
+Or in the terminal run 
 ```
-./run.sh
+./setup-php.sh
 ```

@@ -1,77 +1,32 @@
 #!/usr/bin/env bash
 
-# Constants for PHP 8.5 (Modern Expression-Oriented PHP)
-PHP_VERSION="8.5.4"
-BIN_DIR="./bin"
-PORT=8000
+# Setup directory and local binary path
+mkdir -p bin
+PHP_BIN="./bin/php"
+[[ "$(uname -s)" == MINGW* || "$(uname -s)" == MSYS* ]] && PHP_BIN="./bin/php.exe"
 
-_install_php() {
-    local os_type="$(uname -s)"
-    local arch_type="$(uname -m)"
-    local url=""
-    local target_bin=""
-
-    echo "Platform detected: $os_type ($arch_type)"
-    mkdir -p "$BIN_DIR"
-
-    case "$os_type" in
-        Darwin*)
-            target_bin="$BIN_DIR/php"
-            if [ "$arch_type" = "arm64" ]; then
-                url="https://dl.static-php.dev/static-php-cli/common/php-$PHP_VERSION-cli-macos-aarch64.tar.gz"
-            else
-                url="https://dl.static-php.dev/static-php-cli/common/php-$PHP_VERSION-cli-macos-x86_64.tar.gz"
-            fi
-            ;;
-        Linux*)
-            target_bin="$BIN_DIR/php"
-            if [ "$arch_type" = "aarch64" ] || [ "$arch_type" = "arm64" ]; then
-                url="https://dl.static-php.dev/static-php-cli/common/php-$PHP_VERSION-fpm-linux-aarch64.tar.gz"
-            else
-                url="https://dl.static-php.dev/static-php-cli/common/php-$PHP_VERSION-fpm-linux-x86_64.tar.gz"
-            fi
-            ;;
-        MINGW*|MSYS*|CYGWIN*)
-            url="https://github.com/crazywhalecc/static-php-cli/releases/download/2.8.3/spc-windows-x64.exe"
-            target_bin="$BIN_DIR/php.exe"
-            ;;
-        *)
-            echo "Error: Unsupported OS $os_type"
-            exit 1
-            ;;
+# 1. Install if missing
+if [ ! -f "$PHP_BIN" ]; then
+    echo "Installing static PHP binary..."
+    
+    case "$(uname -s)-$(uname -m)" in
+        Darwin-arm64)  URL="https://dl.static-php.dev/static-php-cli/common/php-8.5.4-cli-macos-aarch64.tar.gz" ;;
+        Darwin-x86_64) URL="https://dl.static-php.dev/static-php-cli/common/php-8.5.4-cli-macos-x86_64.tar.gz" ;;
+        Linux-aarch64) URL="https://dl.static-php.dev/static-php-cli/common/php-8.5.4-cli-linux-aarch64.tar.gz" ;;
+        Linux-x86_64)  URL="https://dl.static-php.dev/static-php-cli/common/php-8.5.4-cli-linux-x86_64.tar.gz" ;;
+        MINGW*-*|MSYS*-*) URL="https://github.com/crazywhalecc/static-php-cli/releases/download/2.8.3/spc-windows-x64.exe" ;;
+        *) echo "Unsupported platform"; exit 1 ;;
     esac
 
-    echo "Downloading PHP from $url..."
-    if [[ "$url" == *.tar.gz ]]; then
-        curl -L "$url" | tar -xz -C "$BIN_DIR"
-        if [ -f "$BIN_DIR/php-cli" ]; then
-            mv "$BIN_DIR/php-cli" "$target_bin"
-        elif [ -f "$BIN_DIR/php" ] && [ "$target_bin" != "$BIN_DIR/php" ]; then
-            mv "$BIN_DIR/php" "$target_bin"
-        fi
+    if [[ "$URL" == *.tar.gz ]]; then
+        curl -L "$URL" | tar -xz -C bin/
+        [ -f bin/php-cli ] && mv bin/php-cli "$PHP_BIN"
     else
-        curl -L "$url" -o "$target_bin"
+        curl -L "$URL" -o "$PHP_BIN"
     fi
-
-    chmod +x "$target_bin"
-    echo "PHP installed to $target_bin"
-}
-
-# Find or Install
-if [ -f "$BIN_DIR/php.exe" ]; then
-    PHP_EXEC="$BIN_DIR/php.exe"
-elif [ -f "$BIN_DIR/php" ]; then
-    PHP_EXEC="$BIN_DIR/php"
-else
-    _install_php
-    [ -f "$BIN_DIR/php.exe" ] && PHP_EXEC="$BIN_DIR/php.exe" || PHP_EXEC="$BIN_DIR/php"
+    chmod +x "$PHP_BIN"
 fi
 
-# Final sanity check
-if [ ! -f "$PHP_EXEC" ]; then
-    echo "Failed to locate or install PHP binary."
-    exit 1
-fi
-
-echo "Launching PHP $PHP_VERSION Development Server on http://localhost:$PORT"
-exec "$PHP_EXEC" -S localhost:$PORT
+# 2. Launch Server (Transparent OS process)
+echo "Starting PHP server on http://localhost:8000"
+exec "$PHP_BIN" -S localhost:8000
