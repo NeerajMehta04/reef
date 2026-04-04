@@ -2,5 +2,6 @@
     "recommendations": [
         "xdebug.php-debug",
         "bmewburn.vscode-intelephense-client",
+        "github.copilot-chat"
     ]
 }

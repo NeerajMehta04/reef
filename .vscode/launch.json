@@ -6,6 +6,9 @@
             "type": "node-terminal",
             "request": "launch",
             "command": "./setup-php.sh",
+            "windows": {
+                "command": ".\\setup-php.bat"
+            },
             "cwd": "${workspaceFolder}",
             "serverReadyAction": {
                 "pattern": "Starting PHP server on (http://\\S+)",
