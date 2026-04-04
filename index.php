@@ -1,4 +1,22 @@
-You can type stuff here!
+<!DOCTYPE html>
+<html lang="en">
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carbon Calculator</title>
 
 
-<?= date('Y-m-d') ?>
+<header>
+
+</header>
+
+<main>
+
+<h1>Carbon Calculator</h1>
+
+<p>Lets do some calculations!
+</main>
+
+<footer>
+  <?= date('Y-m-d') ?>
+</footer>
